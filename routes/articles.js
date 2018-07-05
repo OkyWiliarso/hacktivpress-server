@@ -3,6 +3,7 @@ const router = express.Router()
 const {
   addArticle,
   getArticles,
+  getById,
   getByCategory,
   getByAuthor,
   editArticle,
@@ -19,7 +20,8 @@ const {
 
 router
   .post('/add', loginCheck, multer.single('image'), sendUploadToGCS, addArticle)
-  .get('/list/', getArticles)
+  .get('/list', getArticles)
+  .get('/:id', loginCheck, getById)
   .get('/category/:category', getByCategory)
   .get('/author/:author', getByAuthor)
   .put('/edit/:id', loginCheck, editArticle)

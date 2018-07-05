@@ -39,6 +39,22 @@ module.exports = {
       })
     })
   },
+  getById: (req, res) => {
+    Article.findById(req.params.id)
+    .populate('author')
+    .then(response => {
+      res.status(200).json({
+        message: 'get article success',
+        response
+      })
+    })
+    .catch(err => {
+      res.status(400).json({
+        message: 'cannot get article',
+        err
+      })
+    })
+  },
   getByCategory: (req, res) => {
     Article.find({
       category: req.params.category
@@ -98,18 +114,49 @@ module.exports = {
     })
   },
   deleteArticle: (req, res) => {
-    Article.deleteOne({
-      _id: req.params.id
-    })
+    Article.findById(req.params.id)
+    .populate('author')
     .then(response => {
-      res.status(200).json({
-        message: 'delete article success'
-      })
+      if(response.author._id == req.user.id) {
+        Article.deleteOne({
+          _id: req.params.id
+        })
+        .then(response => {
+          res.status(200).json({
+            message: 'delete article success'
+          })
+        })
+        .catch(err => {
+          res.status(400).json({
+            message: 'delete article failed'
+          })
+        })
+      } else {
+        res.status(400).json({
+          message: 'not authorized',
+          err
+        })  
+      } 
     })
     .catch(err => {
       res.status(400).json({
-        message: 'delete article failed'
+        message: 'delete article failed',
+        err
       })
     })
+
+    // Article.deleteOne({
+    //   _id: req.params.id
+    // })
+    // .then(response => {
+    //   res.status(200).json({
+    //     message: 'delete article success'
+    //   })
+    // })
+    // .catch(err => {
+    //   res.status(400).json({
+    //     message: 'delete article failed'
+    //   })
+    // })
   }
 }
